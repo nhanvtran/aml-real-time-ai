@@ -146,12 +146,12 @@ def main():
 			# now get the featurizer pb file and load it into a graph
 			# in the setup above, you download a zip file with the pb files in it in ~/models
 			# unzip this file and then correct the path below
-			# graph, graph_def = load_graph('/Users/ntran/models/resnet50/1.1.6-rc/resnet50.pb'); 
-			graphC, graphC_def = load_graph('/Users/ntran/models/resnet50/1.1.6-rc/resnet50_classifier.pb');
+			graph, graph_def = load_graph(model_path+'/resnet50/1.1.6-rc/resnet50.pb'); 
+			graphC, graphC_def = load_graph(model_path+'/resnet50/1.1.6-rc/resnet50_classifier.pb');
 			#for op in graph.get_operations(): print(op.name)
 			# for op in graphC.get_operations(): print(op.name)
-			# x = graph.get_tensor_by_name('prefix/InputImage:0')
-			# y = graph.get_tensor_by_name('prefix/resnet_v1_50/pool5:0')
+			x = graph.get_tensor_by_name('prefix/InputImage:0')
+			y = graph.get_tensor_by_name('prefix/resnet_v1_50/pool5:0')
 			xc = graphC.get_tensor_by_name('prefix/Input:0')
 			yc = graphC.get_tensor_by_name('prefix/resnet_v1_50/logits/Softmax:0')
 			printDeltaTime("Time to load graph",time0tf)
@@ -168,7 +168,7 @@ def main():
 				result = sess.run(y, feed_dict = {x:inputs})
 				printDeltaTime("Time to infer Resnet50 featurizer on CPU",time0tf)
 
-			resultC = None # featurizer result
+			resultC = None # classifier result
 			with tf.Session(graph=graphC) as sessC:
 				sessC.run(tf.global_variables_initializer())
 				resultC = sessC.run(yc, feed_dict = {xc:result})
